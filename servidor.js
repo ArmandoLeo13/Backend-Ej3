@@ -13,36 +13,48 @@ class Contenedor {
         let nuevaData 
         try{
             contenido = await fs.promises.readFile(this.nombreArchivo,'utf-8');
-            nuevaData = JSON.parse(contenido);
+            //nuevaData = JSON.parse(contenido);
         }
         catch (err){
             console.log("linea 14"+err);
         }
-        return nuevaData
+        return contenido
     }
     async getRandom(){
         try{
             let nuevaData = await this.getAll();
-            let longitud = nuevaData.length;
+            let dataCorregida = JSON.parse(nuevaData);
+            let longitud = dataCorregida.length;
             let ide = Math.floor((Math.random())*longitud)
-            let dataCorregida = nuevaData.find(({ id })=> id === ide)
-            return dataCorregida
+            let dataCorregida2 = dataCorregida.find(({ id })=> id === ide)
+            let dataFinal = JSON.stringify(dataCorregida2);
+            
+            return dataFinal
         }
         catch(err){console.log(err)}
     }
     
 }
 
-const prue = new Contenedor('productos.txt');
-const pro = await prue.getAll();
-const proRandom = await prue.getRandom();
+let data = [];
+let data2 = [];
+
+(async () => {
+    const prue = new Contenedor('productos.txt');
+  
+    data = await prue.getAll();
+    data2 = await prue.getRandom();
+
+  })();
 
 app.get('/productos',(req,res)=>{
-    res.end(pro);
+
+    res.end(data);
 });
 
 app.get('/productoRandom',(req,res)=>{
-    res.end(proRandom);
+    
+    res.end(data2);
 });
 
 const server = app.listen(PORT, () => {
